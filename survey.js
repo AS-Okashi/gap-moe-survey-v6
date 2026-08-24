@@ -167,34 +167,47 @@ function showAttributes(){const o=collectOverall();if(!o){el("overallError").tex
 function saveAnswer() {
   const c = currentCharacter();
 
+  // 実際にチェックされている項目だけ取得
   const selected = [
     ...el("attributeSelector").querySelectorAll("input:checked")
   ].map(i => i.value);
 
+  // 何も選択されていない場合
   if (selected.length === 0) {
     el("attributeError").textContent =
       "変化を感じた要素を1つ以上選択してください。該当する要素がない場合は「特になし」を選択してください。";
     return;
   }
-  
-  const missing = selected.filter(
-    k => !document.querySelector(`input[name="attr_${k}"]:checked`)
-  );
 
-  if (missing.length) {
-    el("attributeError").textContent =
-      "選択したすべての要素について評価してください。";
-    return;
+  let scores = {};
+
+  // 「特になし」以外の場合
+  if (!selected.includes("none")) {
+
+    // 選択した要素の寄与度がすべて回答されているか確認
+    const missing = selected.filter(
+      k => !document.querySelector(`input[name="attr_${k}"]:checked`)
+    );
+
+    if (missing.length) {
+      el("attributeError").textContent =
+        "選択したすべての要素について評価してください。";
+      return;
+    }
+
+    // 寄与度を取得
+    scores = Object.fromEntries(
+      selected.map(k => [
+        k,
+        Number(
+          document.querySelector(`input[name="attr_${k}"]:checked`).value
+        )
+      ])
+    );
   }
 
-  const scores = Object.fromEntries(
-    selected.map(k => [
-      k,
-      Number(
-        document.querySelector(`input[name="attr_${k}"]:checked`).value
-      )
-    ])
-  );
+  // エラー表示を消す
+  el("attributeError").textContent = "";
 
   // 同じキャラクターの回答が既にある場合は置き換える
   state.answers = state.answers.filter(
@@ -227,10 +240,8 @@ function saveAnswer() {
     state.characterOrder.length - 1
   ) {
     state.currentCharacterIndex++;
-
     loadIntro();
   } else {
-    // 全キャラクター終了
     finishSurvey();
   }
 }
