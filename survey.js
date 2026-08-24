@@ -298,7 +298,36 @@ async function finishSurvey() {
   setProgress();
 }
 function downloadJson(){const b=new Blob([JSON.stringify({...state,surveyVersion:"v5",schemaVersion:"two-image-v1"},null,2)],{type:"application/json"}),a=document.createElement("a");a.href=URL.createObjectURL(b);a.download=`gap-moe-survey-${state.participant.id||"response"}.json`;a.click();URL.revokeObjectURL(a.href);}
-function restore(){try{const s=JSON.parse(localStorage.getItem(STORAGE_KEY));if(!s||!s.startedAt||s.completedAt)return false;Object.assign(state,s);return confirm("途中保存された回答があります。続きから再開しますか？");}catch{return false;}}
+function restore() {
+  try {
+    const saved = JSON.parse(localStorage.getItem(STORAGE_KEY));
+
+    if (!saved || !saved.startedAt || saved.completedAt) {
+      return false;
+    }
+
+    const resume = confirm(
+      "途中保存された回答があります。続きから再開しますか？"
+    );
+
+    if (!resume) {
+      // 新しく最初から回答する
+      localStorage.removeItem(STORAGE_KEY);
+      return false;
+    }
+
+    // OKの場合のみ復元
+    Object.assign(state, saved);
+
+    return true;
+
+  } catch (error) {
+    console.error("途中保存データの復元に失敗しました:", error);
+    localStorage.removeItem(STORAGE_KEY);
+    return false;
+  }
+}
+
 
 el("participantForm").addEventListener("submit",e=>{e.preventDefault();const gender=document.querySelector('input[name="gender"]:checked'),values=[el("age").value,gender?.value,el("anime").value,el("fashion").value,el("gapFamiliarity").value];if(values.some(v=>!v)){el("participantError").textContent="必須項目をすべて入力してください。";return;}state.participant={id: `P${Date.now()}`,age: el("age").value,gender: gender.value,anime: el("anime").value,fashion: el("fashion").value,gapFamiliarity: el("gapFamiliarity").value};state.characterOrder=shuffle(characters.map(c=>c.id));state.startedAt=new Date().toISOString();saveProgress();showPage("guide-page");});
 el("guideNextBtn").onclick=()=>{showPage("survey-page");loadIntro();};el("startCharacterBtn").onclick=loadEvaluation;el("toAttributeBtn").onclick=showAttributes;el("backToOverallBtn").onclick=()=>{el("attributePhase").hidden=true;el("overallPhase").hidden=false;};el("saveVariantBtn").onclick=saveAnswer;el("saveProgressBtn").onclick=()=>saveProgress(true);el("downloadJsonBtn").onclick=downloadJson;el("clearDataBtn").onclick=()=>{if(confirm("保存データを削除しますか？")){localStorage.removeItem(STORAGE_KEY);location.reload();}};
