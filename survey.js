@@ -98,8 +98,8 @@ function renderAttributeRatings() {
 
   // 現在選択されている要素
   const selected = [
-    ...el("attributeSelector").querySelectorAll("input:checked")
-  ].map(i => i.value);
+  ...el("attributeSelector").querySelectorAll("input:checked")
+].map(i => i.value);
 
   state.currentAttributes = selected;
 
