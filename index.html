@@ -1,0 +1,261 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="color-scheme" content="dark">
+<title>ギャップ萌え認知アンケート</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<header class="site-header">
+<div>
+<p class="eyebrow">HUMAN PERCEPTION SURVEY</p>
+<h1>ギャップ萌え認知アンケート</h1>
+</div>
+<div id="headerProgress" class="header-progress" hidden>
+<span id="headerProgressText">準備中</span>
+<div class="progress-track">
+<span id="headerProgressBar">
+</span>
+</div>
+</div>
+</header>
+<main>
+  <section id="participant-page" class="page active">
+<div class="intro-layout">
+<div class="intro-copy">
+<p class="step-label">STEP 0</p>
+<h2>はじめに</h2>
+<p class="lead">元のキャラクターと変更後画像を見比べ、ギャップ・萌え・ギャップ萌えを回答していただきます。</p>
+<div class="notice">
+<strong>回答の流れ</strong>
+<ol>
+<li>元画像と変更後画像を確認する</li>
+<li>画像全体を評価する</li>
+<li>変化を感じた要素を選ぶ</li>
+<li>選んだ要素の寄与度と任意の理由を回答する</li>
+</ol>
+</div>
+</div>
+<form id="participantForm" class="panel form-panel" novalidate>
+<h3>回答者情報</h3>
+<div class="field-grid two-columns">
+<label class="field">
+<span>年齢 <em>必須</em>
+</span>
+<select id="age" required>
+<option value="">選択してください</option>
+<option>10代</option>
+<option>20代</option>
+<option>30代</option>
+<option>40代</option>
+<option>50代以上</option>
+</select>
+</label>
+<fieldset class="field fieldset-reset">
+<legend>性別 <em>必須</em>
+</legend>
+<div class="segmented compact">
+<label>
+<input type="radio" name="gender" value="男性">
+<span>男性</span>
+</label>
+<label>
+<input type="radio" name="gender" value="女性">
+<span>女性</span>
+</label>
+<label>
+<input type="radio" name="gender" value="その他">
+<span>その他</span>
+</label>
+<label>
+<input type="radio" name="gender" value="回答しない">
+<span>回答しない</span>
+</label>
+</div>
+</fieldset>
+<label class="field">
+<span>アニメ・イラストへの関心 <em>必須</em>
+</span>
+<select id="anime" required>
+<option value="">選択してください</option>
+<option>とても高い</option>
+<option>高い</option>
+<option>普通</option>
+<option>あまり高くない</option>
+<option>まったく高くない</option>
+</select>
+</label>
+<label class="field">
+<span>ファッションへの関心 <em>必須</em>
+</span>
+<select id="fashion" required>
+<option value="">選択してください</option>
+<option>とても高い</option>
+<option>高い</option>
+<option>普通</option>
+<option>あまり高くない</option>
+<option>まったく高くない</option>
+</select>
+</label>
+<label class="field full-width">
+<span>「ギャップ萌え」という言葉への理解 <em>必須</em>
+</span>
+<select id="gapFamiliarity" required>
+<option value="">選択してください</option>
+<option>意味をよく理解している</option>
+<option>だいたい理解している</option>
+<option>聞いたことはある</option>
+<option>ほとんど知らない</option>
+</select>
+</label>
+</div>
+<p id="participantError" class="error">
+</p>
+<button class="primary-button" type="submit">回答方法を確認する</button>
+</form>
+</div>
+</section>
+<section id="guide-page" class="page" aria-labelledby="guide-title">
+<p class="step-label">STEP 1</p>
+<h2 id="guide-title">回答方法</h2>
+<div class="guide-layout">
+<article class="panel definition-panel">
+<h3>この調査における「ギャップ萌え」</h3>
+<p>元のキャラクターから予想される印象とは異なる服装でありながら、その意外性が魅力や好意的な感情につながっている状態を指します。</p>
+<p class="muted">「大きく変わった」「可愛い」「似合っている」は、それぞれギャップ萌えと同じ意味ではありません。感じたままを別々に評価してください。</p>
+</article>
+<article class="panel flow-panel">
+<h3>1キャラクターあたりの回答手順</h3>
+<div class="mini-flow">
+<div><b>1</b><span>2枚を確認</span><small>元画像と変更後画像</small></div>
+<i>→</i>
+<div><b>2</b><span>全体評価</span><small>第一印象で回答</small></div>
+<i>→</i>
+<div><b>3</b><span>要素別寄与</span><small>選んだ要素だけ採点</small></div>
+</div>
+</article>
+<article class="panel scale-panel">
+<h3>評価尺度</h3>
+<div class="scale-line"><span>1</span><div></div><span>7</span></div>
+<div class="scale-caption"><span>まったく当てはまらない</span><span>非常によく当てはまる</span></div>
+<p class="muted">元画像と変更後画像を比較します。画像の生成条件や意図は回答者には示しません。</p>
+</article>
+</div>
+<div class="actions"><button id="guideNextBtn" class="primary-button" type="button">アンケートを開始する</button></div>
+</section>
+  <section id="survey-page" class="page" aria-live="polite">
+<div class="survey-heading">
+<div>
+<p id="characterKicker" class="step-label">
+</p>
+<h2 id="characterNumber">キャラクター評価</h2>
+</div>
+<button id="saveProgressBtn" class="ghost-button" type="button">途中保存</button>
+</div>
+<div id="characterIntro" class="character-intro panel">
+<div class="original-frame">
+<span class="image-badge">ORIGINAL</span>
+<img id="originalImage" alt="元のキャラクター画像">
+</div>
+<div class="character-copy">
+<p class="overline">元キャラクター</p>
+<h3 id="characterName">
+</h3>
+<dl>
+<div>
+<dt>年齢</dt>
+<dd id="characterAge">
+</dd>
+</div>
+<div>
+<dt>性格</dt>
+<dd id="characterPersonality">
+</dd>
+</div>
+<div>
+<dt>普段の印象</dt>
+<dd id="characterFeature">
+</dd>
+</div>
+</dl>
+<p>元画像を確認したあと、変更後画像を評価してください。</p>
+<div id="countdownArea" class="countdown-area">
+  <p>変更後画像の評価開始まで</p>
+  <strong id="countdownNumber">5</strong>
+  <span>秒</span>
+</div>
+
+<button id="startCharacterBtn" class="primary-button" type="button" hidden>
+  変更後画像の評価を始める
+</button>
+</div>
+</div>
+<div id="variantEvaluation" hidden>
+<div class="image-stage panel">
+<div class="comparison-image">
+<span class="image-badge subdued">ORIGINAL</span>
+<img id="variantOriginalImage" alt="元画像">
+</div>
+<div class="image-arrow" aria-hidden="true">→</div>
+<div class="comparison-image active-image">
+<span id="variantBadge" class="image-badge">変更後</span>
+<img id="variantImage" alt="変更後画像">
+</div>
+</div>
+<section id="overallPhase" class="question-panel panel">
+<p class="phase-label">PHASE 1 / 全体評価</p>
+<h3>画像全体を見た第一印象を評価してください</h3>
+<div id="overallQuestions" class="rating-list">
+</div>
+<p id="overallError" class="error">
+</p>
+<div class="actions right">
+<button id="toAttributeBtn" class="primary-button" type="button">全体評価を確定して要素評価へ</button>
+</div>
+</section>
+<section id="attributePhase" class="question-panel panel" hidden>
+<p class="phase-label">PHASE 2 / 要素別評価</p>
+<h3>どの要素の変化がギャップ萌えに関係したか</h3>
+<p>元画像と比べて変化を感じた要素を選択してください。</p>
+<div id="attributeSelector" class="attribute-selector">
+</div>
+<div id="attributeRatings" class="attribute-ratings">
+</div>
+<label class="field optional-text">
+<span>その他に変化を感じた点、または判断理由（任意）</span>
+<textarea id="variantReason" rows="3">
+</textarea>
+</label>
+<p id="attributeError" class="error">
+</p>
+<div class="actions between">
+<button id="backToOverallBtn" class="ghost-button" type="button">全体評価を見直す</button>
+<button id="saveVariantBtn" class="primary-button" type="button">このキャラクターの回答を保存する</button>
+</div>
+</section>
+</div>
+</section>
+  <section id="finish-page" class="page">
+<div class="finish-card panel">
+<p class="step-label">COMPLETED</p>
+<h2>アンケート終了</h2>
+<p class="lead">ご協力ありがとうございました。</p>
+<p id="submitStatus" class="status-message">
+</p>
+<div class="finish-actions">
+<button id="downloadJsonBtn" class="ghost-button" type="button">回答JSONを保存</button>
+<button id="clearDataBtn" class="danger-button" type="button">端末内の途中データを削除</button>
+</div>
+</div>
+</section>
+</main>
+<footer>
+<span>Gap Moe Human Perception Study — Survey v5</span>
+<span>モック画像使用</span>
+</footer>
+<script src="survey.js">
+</script>
+</body>
+</html>
