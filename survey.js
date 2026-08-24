@@ -39,8 +39,6 @@ function saveProgress(show=false){localStorage.setItem(STORAGE_KEY,JSON.stringif
 function setProgress(){const h=el("headerProgress");if(!state.startedAt||state.completedAt){h.hidden=true;return;}h.hidden=false;el("headerProgressText").textContent=`キャラクター ${state.currentCharacterIndex+1} / ${state.characterOrder.length}`;el("headerProgressBar").style.width=`${Math.max(3,state.currentCharacterIndex/state.characterOrder.length*100)}%`;}
 function renderOverall(){el("overallQuestions").innerHTML=overallQuestions.map(q=>`<div class="rating-row"><div><span class="question-title">${q.label}</span><span class="question-help">${q.help}</span></div><div><div class="likert">${[1,2,3,4,5,6,7].map(v=>`<label><input type="radio" name="overall_${q.key}" value="${v}"><span>${v}</span></label>`).join("")}</div><div class="likert-anchors"><span>${q.low}</span><span>${q.high}</span></div></div></div>`).join("");}
 function renderAttributes() {
-
-  // 「特になし」を追加
   el("attributeSelector").innerHTML = `
     <label class="attribute-chip">
       <input type="checkbox" value="none" id="noAttribute">
@@ -49,28 +47,26 @@ function renderAttributes() {
         <small>変化を感じた要素は特にない</small>
       </span>
     </label>
-  ` +
-  attributes.map(a => `
-    <label class="attribute-chip">
-      <input type="checkbox" value="${a.key}">
-      <span>
-        <strong>${a.label}</strong>
-        <small>${a.help}</small>
-      </span>
-    </label>
-  `).join("");
+
+    ${attributes.map(a => `
+      <label class="attribute-chip">
+        <input type="checkbox" value="${a.key}">
+        <span>
+          <strong>${a.label}</strong>
+          <small>${a.help}</small>
+        </span>
+      </label>
+    `).join("")}
+  `;
 
   el("attributeSelector")
     .querySelectorAll("input")
     .forEach(input => {
       input.onchange = () => {
-
         const none = el("noAttribute");
 
-        // 「特になし」を選択した場合
+        // 「特になし」を選択
         if (input.value === "none" && input.checked) {
-
-          // 他の要素をすべて解除
           el("attributeSelector")
             .querySelectorAll('input:not(#noAttribute)')
             .forEach(other => {
@@ -78,10 +74,8 @@ function renderAttributes() {
             });
         }
 
-        // 他の要素を選択した場合
+        // 通常の項目を選択
         if (input.value !== "none" && input.checked) {
-
-          // 「特になし」を解除
           none.checked = false;
         }
 
@@ -177,6 +171,12 @@ function saveAnswer() {
     ...el("attributeSelector").querySelectorAll("input:checked")
   ].map(i => i.value);
 
+  if (selected.length === 0) {
+    el("attributeError").textContent =
+      "変化を感じた要素を1つ以上選択してください。該当する要素がない場合は「特になし」を選択してください。";
+    return;
+  }
+  
   const missing = selected.filter(
     k => !document.querySelector(`input[name="attr_${k}"]:checked`)
   );
