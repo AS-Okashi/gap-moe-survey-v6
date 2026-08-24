@@ -38,7 +38,59 @@ function currentCharacter(){return characters.find(c=>c.id===state.characterOrde
 function saveProgress(show=false){localStorage.setItem(STORAGE_KEY,JSON.stringify(state));if(show){const b=el("saveProgressBtn"),old=b.textContent;b.textContent="保存しました";setTimeout(()=>b.textContent=old,1200);}}
 function setProgress(){const h=el("headerProgress");if(!state.startedAt||state.completedAt){h.hidden=true;return;}h.hidden=false;el("headerProgressText").textContent=`キャラクター ${state.currentCharacterIndex+1} / ${state.characterOrder.length}`;el("headerProgressBar").style.width=`${Math.max(3,state.currentCharacterIndex/state.characterOrder.length*100)}%`;}
 function renderOverall(){el("overallQuestions").innerHTML=overallQuestions.map(q=>`<div class="rating-row"><div><span class="question-title">${q.label}</span><span class="question-help">${q.help}</span></div><div><div class="likert">${[1,2,3,4,5,6,7].map(v=>`<label><input type="radio" name="overall_${q.key}" value="${v}"><span>${v}</span></label>`).join("")}</div><div class="likert-anchors"><span>${q.low}</span><span>${q.high}</span></div></div></div>`).join("");}
-function renderAttributes(){el("attributeSelector").innerHTML=attributes.map(a=>`<label class="attribute-chip"><input type="checkbox" value="${a.key}"><span><strong>${a.label}</strong><small>${a.help}</small></span></label>`).join("");el("attributeSelector").querySelectorAll("input").forEach(i=>i.onchange=renderAttributeRatings);renderAttributeRatings();}
+function renderAttributes() {
+
+  // 「特になし」を追加
+  el("attributeSelector").innerHTML = `
+    <label class="attribute-chip">
+      <input type="checkbox" value="none" id="noAttribute">
+      <span>
+        <strong>特になし</strong>
+        <small>変化を感じた要素は特にない</small>
+      </span>
+    </label>
+  ` +
+  attributes.map(a => `
+    <label class="attribute-chip">
+      <input type="checkbox" value="${a.key}">
+      <span>
+        <strong>${a.label}</strong>
+        <small>${a.help}</small>
+      </span>
+    </label>
+  `).join("");
+
+  el("attributeSelector")
+    .querySelectorAll("input")
+    .forEach(input => {
+      input.onchange = () => {
+
+        const none = el("noAttribute");
+
+        // 「特になし」を選択した場合
+        if (input.value === "none" && input.checked) {
+
+          // 他の要素をすべて解除
+          el("attributeSelector")
+            .querySelectorAll('input:not(#noAttribute)')
+            .forEach(other => {
+              other.checked = false;
+            });
+        }
+
+        // 他の要素を選択した場合
+        if (input.value !== "none" && input.checked) {
+
+          // 「特になし」を解除
+          none.checked = false;
+        }
+
+        renderAttributeRatings();
+      };
+    });
+
+  renderAttributeRatings();
+}
 function renderAttributeRatings() {
   // 現在入力されている寄与度を保存
   const previousScores = {};
@@ -57,13 +109,27 @@ function renderAttributeRatings() {
 
   state.currentAttributes = selected;
 
-  // 寄与評価部分を再生成
+    // 「特になし」の場合
+  if (selected.includes("none")) {
+
+    el("attributeRatings").innerHTML = `
+      <p class="muted">
+        「特になし」が選択されているため、寄与度の評価はありません。
+      </p>
+    `;
+
+    return;
+  }
+
+    // 通常の要素の場合
   el("attributeRatings").innerHTML = selected.length
     ? selected.map(k => {
+
         const a = attributes.find(x => x.key === k);
 
         return `
           <div class="attribute-rating-row">
+
             <div class="attribute-rating-header">
               <strong>${a.label}</strong>
               <span>この変化がギャップ萌えに関係した程度</span>
@@ -87,12 +153,16 @@ function renderAttributeRatings() {
               <span>ほとんど関係しない</span>
               <span>非常に強く関係した</span>
             </div>
+
           </div>
         `;
+
       }).join("")
+
     : `
       <p class="muted">
-        変化を感じた要素を選択すると、寄与評価が表示されます。
+        変化を感じた要素を選択してください。
+        変化を感じた要素がない場合は「特になし」を選択してください。
       </p>
     `;
 }
